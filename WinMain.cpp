@@ -1,4 +1,6 @@
 #include <Windows.h>
+#include <string>
+#include <sstream>
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -7,16 +9,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		PostQuitMessage(97);
 		break;
-	case WM_KEYDOWN:
+	case WM_KEYDOWN: // Not case sensitive - could be any button on the keyboard - use when case is not important (ie: movement controls)
 		if (wParam == 'F')
 		{
-			SetWindowText(hWnd, L"Respect");
+			SetWindowText(hWnd, "Respect");
 		}
 		break;
-	case WM_KEYUP:
+	case WM_KEYUP: 
 		if (wParam == 'F')
 		{
-			SetWindowText(hWnd, L"Dangerfield");
+			SetWindowText(hWnd, "Dangerfield");
+		}
+		break;
+	case WM_CHAR: // Text input - case sensitive - use when case is important (ie: capturing typing of a character name)
+		{
+			static std::string title;
+			title.push_back((char)wParam);
+			SetWindowText(hWnd, title.c_str());
+		}	
+		break;
+	case WM_LBUTTONDOWN:
+		{
+			POINTS pt = MAKEPOINTS(lParam);
+			std::ostringstream oss;
+			oss << "(" << pt.x << "," << pt.y << ")";
+			SetWindowText(hWnd, oss.str().c_str());
 		}
 		break;
 	}
@@ -29,7 +46,7 @@ int CALLBACK WinMain(
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
-	const auto pClassName = L"hw3dbutts";
+	const auto pClassName = "hw3dbutts";
 	// register window class
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
@@ -50,7 +67,7 @@ int CALLBACK WinMain(
 	// create window instance
 	HWND hWnd = CreateWindowEx(
 		0, pClassName,
-		L"Happy Hard Window",
+		"Happy Hard Window",
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,  // Styles: https://docs.microsoft.com/en-us/windows/desktop/winmsg/window-styles
 		200, 200, 640, 480,
 		nullptr,
